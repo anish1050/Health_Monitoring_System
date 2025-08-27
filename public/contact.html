@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact | HealthWise</title>
+  <link rel="stylesheet" href="learnmore.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">Health<span>Wise</span></div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="container">
+      <h1>Contact Us</h1>
+      <p>We’d love to hear from you! Reach out to us at <strong>support@healthwise.com</strong> or fill out the form below.</p>
+      <form>
+        <input type="text" placeholder="Your Name" required /><br /><br />
+        <input type="email" placeholder="Your Email" required /><br /><br />
+        <textarea placeholder="Your Message" required></textarea><br /><br />
+        <button type="submit" class="btn">Send Message</button>
+      </form>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> HealthWise. All rights reserved.</p>
+    </div>
+  </footer>
+  <script>document.getElementById("year").textContent = new Date().getFullYear();</script>
+</body>
+</html>

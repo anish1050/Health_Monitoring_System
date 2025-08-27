@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us | HealthWise</title>
+  <link rel="stylesheet" href="learnmore.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">Health<span>Wise</span></div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="content">
+    <div class="container">
+      <h1>About Us</h1>
+      <p>We’re HealthWise — our mission is to make health tracking simple, smart, and accessible for everyone.</p>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> HealthWise. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

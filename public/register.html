@@ -1,0 +1,84 @@
+<!-- register.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register | HeartWise</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="/register.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="register-container">
+    <form class="register-box" onsubmit="registerUser(event)">
+      <h2>Create your HealthWise Account</h2>
+      <div class="form-group">
+        <label for="first_name">First Name</label>
+        <input id="first_name" type="text" placeholder="Your First Name" required />
+      </div>
+      <div class="form-group">
+        <label for="last_name">Last Name</label>
+        <input id="last_name" type="text" placeholder="Your Last Name" required />
+      </div>
+      <div class="form-group">
+        <label for="username">User Name</label>
+        <input id="username" type="text" placeholder="Choose a Username" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="you@email.com" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input id="password" type="password" placeholder="••••••••" required />
+      </div>
+      <div class="form-group">
+        <label for="confirm">Confirm Password</label>
+        <input id="confirm" type="password" placeholder="••••••••" required />
+      </div>
+      <button class="btn" type="submit">Register</button>
+      <p class="toggle-link">
+        Already have an account? <a href="login.html">Login</a>
+      </p>
+    </form>
+  </div>
+  <script>
+    async function registerUser(event) {
+      event.preventDefault(); // prevent default form reload
+  
+      const first_name = document.getElementById('first_name').value;
+      const last_name = document.getElementById('last_name').value;
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirm = document.getElementById('confirm').value;
+  
+      if (password !== confirm) {
+        alert("Passwords do not match.");
+        return;
+      }
+  
+      try {
+  const response = await fetch('http://localhost:3000/health_monitoring_system/users/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ first_name,last_name, username, email, password })
+  });
+
+    const data = await response.json();
+        if (data.success) {
+          alert("Registered successfully!");
+          window.location.href = '/login.html'; // redirect to login
+        } else {
+          alert("Registration failed: " + (data.message || 'Unknown error'));
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        alert("Error while registering.");
+      }
+      
+
+    }
+  </script>
+  
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Learn More | HealthWise</title>
+  <link rel="stylesheet" href="learnmore.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="container">
+      <div class="logo">Health<span>Wise</span></div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/public/login.html">Log In</a></li>
+          <li><a href="/public/register.html">Register</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Learn More About HealthWise</h1>
+      <p>
+        HealthWise is your partner in health tracking.  
+        With real-time monitoring of <strong>heart rate</strong> and <strong>SpO₂</strong>,
+        you can take control of your health and make better lifestyle decisions.
+      </p>
+      <a href="/" class="btn btn-primary">Back to Home</a>
+    </div>
+  </section>
+
+  <section class="content">
+    <div class="container">
+      <h2>What You Get</h2>
+      <ul>
+        <li>✔ Real-time heart rate monitoring</li>
+        <li>✔ SpO₂ tracking and insights</li>
+        <li>✔ Personalized health recommendations</li>
+        <li>✔ Easy-to-use dashboard and reports</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; <span id="year"></span> HealthWise. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
