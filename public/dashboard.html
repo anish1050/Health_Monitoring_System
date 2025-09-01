@@ -88,127 +88,109 @@
         </footer>
     </div>
     <script>
-        // Run after the page loads
-        document.addEventListener("DOMContentLoaded", () => {
-            const username = localStorage.getItem("username");
-            const welcomeDiv = document.getElementsByClassName("welcomediv")[0];
+document.addEventListener("DOMContentLoaded", () => {
+  const username = localStorage.getItem("username");
+  const welcomeDiv = document.querySelector(".welcomediv");
 
-            if (username) {
-                welcomeDiv.textContent = `Welcome Back, ${username}`;
-            } else {
-                welcomeDiv.textContent = "Welcome Back!";
-            }
-        });
+  welcomeDiv.textContent = username
+    ? `Welcome Back, ${username}`
+    : "Welcome Back!";
 
-        async function fetchHeartRate() {
-    const username = localStorage.getItem("username");
-    if (!username) return;
+  fetchHeartRate();
+  fetchHealthInsights();
+  loadHeartRateByPeriod();
 
-    try {
-        const response = await fetch('https://health-monitoring-system-7l2y.onrender.com/health_data', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ username })
-        });
+  // Refresh data every 5s
+  setInterval(fetchHeartRate, 5000);
+  setInterval(fetchHealthInsights, 5000);
+});
 
-        const data = await response.json();
+async function fetchHeartRate() {
+  const username = localStorage.getItem("username");
+  if (!username) return;
 
-        if (data.success) {
-            const heartRate = data.heart_rate;
-            document.querySelector('.heart-rate-value').textContent = heartRate + ' BPM';
+  try {
+    const response = await fetch("https://health-monitoring-system-7l2y.onrender.com/health_data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username }),
+    });
 
-            // Determine heart rate status
-            const statusText = document.querySelector('.status-text');
-            if (heartRate >= 60 && heartRate <= 100) {
-                statusText.textContent = "Normal";
-                statusText.style.color = "green";
-            } else if (heartRate < 60) {
-                statusText.textContent = "Low";
-                statusText.style.color = "orange";
-            } else {
-                statusText.textContent = "High";
-                statusText.style.color = "red";
-            }
+    const data = await response.json();
 
-        } else {
-            document.querySelector('.heart-rate-value').textContent = 'N/A';
-            document.querySelector('.status-text').textContent = 'Unavailable';
-            document.querySelector('.status-text').style.color = 'gray';
-        }
-    } catch (error) {
-        console.error('Error fetching heart rate:', error);
-        document.querySelector('.heart-rate-value').textContent = 'Error';
-        document.querySelector('.status-text').textContent = 'Error';
-        document.querySelector('.status-text').style.color = 'gray';
+    if (data.success) {
+      const heartRate = data.heart_rate;
+      document.querySelector(".heart-rate-value").textContent = `${heartRate} BPM`;
+
+      const statusText = document.querySelector(".status-text");
+      if (heartRate >= 60 && heartRate <= 100) {
+        statusText.textContent = "Normal";
+        statusText.style.color = "green";
+      } else if (heartRate < 60) {
+        statusText.textContent = "Low";
+        statusText.style.color = "orange";
+      } else {
+        statusText.textContent = "High";
+        statusText.style.color = "red";
+      }
+    } else {
+      showHeartRateError("Unavailable");
     }
+  } catch (error) {
+    console.error("Error fetching heart rate:", error);
+    showHeartRateError("Error");
+  }
+}
+
+function showHeartRateError(message) {
+  document.querySelector(".heart-rate-value").textContent = "N/A";
+  const statusText = document.querySelector(".status-text");
+  statusText.textContent = message;
+  statusText.style.color = "gray";
 }
 
 async function loadHeartRateByPeriod() {
   try {
-    const response = await fetch('https://health-monitoring-system-7l2y.onrender.com/health_data/periodic');
-    const result = await response.json();o
+    const response = await fetch("https://health-monitoring-system-7l2y.onrender.com/health_data/periodic");
+    const result = await response.json();
 
     if (!result.success) {
-      console.error('Error:', result.message);
+      console.error("Error:", result.message);
       return;
     }
 
-    const data = result.data;
+    const { Morning, Afternoon, Evening } = result.data;
 
-    const morningList = document.getElementById('morning-readings');
-    const afternoonList = document.getElementById('afternoon-readings');
-    const eveningList = document.getElementById('evening-readings');
-
-    morningList.innerHTML = '';
-    afternoonList.innerHTML = '';
-    eveningList.innerHTML = '';
-
-    data.Morning.forEach(r => {
-      morningList.innerHTML += `<div>${r.heart_rate} BPM</div>`;
-    });
-
-    data.Afternoon.forEach(r => {
-      afternoonList.innerHTML += `<div>${r.heart_rate} BPM</div>`;
-    });
-
-    data.Evening.forEach(r => {
-      eveningList.innerHTML += `<div>${r.heart_rate} BPM</div>`;
-    });
-
+    document.getElementById("morning-readings").innerHTML =
+      Morning.map(r => `<div>${r.heart_rate} BPM</div>`).join("");
+    document.getElementById("afternoon-readings").innerHTML =
+      Afternoon.map(r => `<div>${r.heart_rate} BPM</div>`).join("");
+    document.getElementById("evening-readings").innerHTML =
+      Evening.map(r => `<div>${r.heart_rate} BPM</div>`).join("");
   } catch (err) {
-    console.error('Fetch error:', err);
+    console.error("Fetch error:", err);
   }
 }
-
-loadHeartRateByPeriod();
 
 async function fetchHealthInsights() {
   const username = localStorage.getItem("username");
   if (!username) return;
 
   try {
-    // First fetch the heart rate insights
-    const heartRateResponse = await fetch('https://health-monitoring-system-7l2y.onrender.com/health_data/insights', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username }),
-    });
+    const [heartRateResponse, spo2Response] = await Promise.all([
+      fetch("https://health-monitoring-system-7l2y.onrender.com/health_data/insights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      }),
+      fetch("https://health-monitoring-system-7l2y.onrender.com/health_data/spo2", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username }),
+      }),
+    ]);
 
     const heartRateData = await heartRateResponse.json();
-
-    // Then fetch the SpO2 data
-    const spo2Response = await fetch("https://health-monitoring-system-7l2y.onrender.com/health_data/spo2", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username })
-    });
-
     const spo2Data = await spo2Response.json();
 
     if (heartRateData.success && spo2Data.success) {
@@ -216,129 +198,53 @@ async function fetchHealthInsights() {
       const insights = heartRateData.insights;
       const spo2 = spo2Data.estimated_spo2;
 
-      // Update the SpO2 display in the dedicated section
       document.querySelector(".spo2-value").textContent = spo2 + "%";
       const spo2Status = document.querySelector(".spo2-status");
-      
-      // Also update the status text and color based on SpO2 value
+
       if (spo2 >= 95) {
-          spo2Status.textContent = "Normal";
-          spo2Status.style.color = "green";
+        spo2Status.textContent = "Normal";
+        spo2Status.style.color = "green";
       } else if (spo2 >= 90) {
-          spo2Status.textContent = "Low";
-          spo2Status.style.color = "orange";
+        spo2Status.textContent = "Low";
+        spo2Status.style.color = "orange";
       } else {
-          spo2Status.textContent = "Critical";
-          spo2Status.style.color = "red";
+        spo2Status.textContent = "Critical";
+        spo2Status.style.color = "red";
       }
 
-      // Determine stress level based on SpO2
       let stress = "Normal";
-      if (spo2 >= 95) {
-        stress = "Low";
-      } else if (spo2 >= 90) {
-        stress = "Moderate";
-      } else {
-        stress = "High";
-      }
+      if (spo2 >= 95) stress = "Low";
+      else if (spo2 >= 90) stress = "Moderate";
+      else stress = "High";
 
       document.getElementById("heart-rate-text").textContent = `Heart Rate: ${heartRate} BPM`;
       document.getElementById("spo2-text").textContent = `SpO₂: ${spo2}%`;
       document.getElementById("stress-level-text").innerHTML = `Stress Level: <strong>${stress}</strong>`;
 
-      const heartRateList = document.getElementById("heart-rate-recommendations");
-      const spo2List = document.getElementById("spo2-recommendations");
+      document.getElementById("heart-rate-recommendations").innerHTML = `<li>${insights}</li>`;
 
-      heartRateList.innerHTML = `<li>${insights}</li>`; // Assuming one insight string
-      
-      // SpO2 recommendations based on value
+      const spo2List = document.getElementById("spo2-recommendations");
       if (spo2 >= 95) {
-        spo2List.innerHTML = `<li>Your oxygen levels are good. Continue with regular breathing exercises to maintain optimal levels.</li>`;
+        spo2List.innerHTML = `<li>Your oxygen levels are good. Keep it up!</li>`;
       } else if (spo2 >= 90) {
         spo2List.innerHTML = `
-          <li>Your oxygen levels are slightly low. Try deep breathing exercises.</li>
-          <li>Consider checking your environment for proper ventilation.</li>
-        `;
+          <li>Your oxygen levels are slightly low. Try deep breathing.</li>
+          <li>Check ventilation in your room.</li>`;
       } else {
         spo2List.innerHTML = `
-          <li>Your oxygen levels appear quite low. Practice deep breathing immediately.</li>
-          <li>Consider seeking medical advice if this reading persists.</li>
-          <li>Move to a well-ventilated area with fresh air.</li>
-        `;
+          <li>Oxygen is very low. Practice deep breathing immediately.</li>
+          <li>Seek medical advice if this persists.</li>
+          <li>Move to fresh air.</li>`;
       }
     } else {
-      console.error('Error:', heartRateData.message || spo2Data.message);
+      console.error("Error:", heartRateData.message || spo2Data.message);
     }
   } catch (err) {
-    console.error('Fetch error:', err);
+    console.error("Fetch error:", err);
   }
 }
+</script>
 
-// We no longer need separate fetchSpO2 calls since we handle SpO2 in fetchHealthInsights
-
-document.addEventListener("DOMContentLoaded", () => {
-    // Initial data fetch when page loads
-    fetchHeartRate();
-    fetchHealthInsights(); // This will now fetch both heart rate and SpO2 data
-    loadHeartRateByPeriod();
-});
-
-// Update the intervals to refresh data
-setInterval(fetchHeartRate, 5000);
-setInterval(fetchHealthInsights, 5000);
-
-// Remove the fetchSpO2 function if it exists in your code, as it's no longer needed
-
-// Remove the fetchSpO2 function calls from DOMContentLoaded and interval
-// since we're now handling SpO2 in the fetchHealthInsights function
-
-document.addEventListener("DOMContentLoaded", () => {
-    fetchHeartRate();
-    fetchHealthInsights(); // This will now fetch both heart rate and SpO2 data
-    loadHeartRateByPeriod();
-});
-
-fetch('/api/health_data')
-      .then(response => response.json())
-      .then(data => {
-        const tableBody = document.querySelector('#healthDataTable tbody');
-        data.forEach(record => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${record.bpm}</td>
-            <td>${record.stress}</td>
-            <td>${record.timestamp}</td>
-          `;
-          tableBody.appendChild(row);
-        });
-      })
-      .catch(error => console.log('Error fetching data:', error));
-
-// Update the intervals to refresh data
-fetchHeartRate();
-setInterval(fetchHeartRate, 5000);
-setInterval(fetchHealthInsights, 5000);
-
-
-// Call the function to fetch and display insights
-fetchHealthInsights();
-
-// Call it once or set interval to update live
-fetchHeartRate();
-setInterval(fetchHeartRate, 5000); // optional: auto-refresh every 5 seconds
-
-fetchSpO2();
-setInterval(fetchSpO2, 5000); // Update every 5 seconds
-
-document.addEventListener("DOMContentLoaded", () => {
-    fetchHeartRate();
-    
-    loadHeartRateByPeriod();
-});
-
-
-
-    </script>
 
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
 </body>
