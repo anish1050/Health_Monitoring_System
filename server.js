@@ -10,26 +10,21 @@ import { fork } from "child_process";
 import { fileURLToPath } from "url";
 import path from "path";
 
-const app = express();
-
-app.use(cors());
-app.use(bodyParser.json());
-app.use(express.json());
-
-app.use(cors({
-  origin: "*",                 // you can restrict to your Vercel domain later
-  methods: ["GET", "POST"]
-}));
-app.use(express.json());
-
 dotenv.config();
 
+const app = express();
+
+// Get __dirname in ES module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ CORS setup
+// JSON body parser
+app.use(express.json());
+
+// CORS setup
 const prodOrigins = [process.env.ORIGIN_1, process.env.ORIGIN_2];
 const devOrigin = ["http://localhost:5173"];
+
 const allowedOrigins =
   process.env.NODE_ENV === "production" ? prodOrigins : devOrigin;
 
