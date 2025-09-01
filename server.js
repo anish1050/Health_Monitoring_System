@@ -16,6 +16,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
+app.use(cors({
+  origin: "*",                 // you can restrict to your Vercel domain later
+  methods: ["GET", "POST"]
+}));
+app.use(express.json());
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
